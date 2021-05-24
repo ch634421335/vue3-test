@@ -23,7 +23,7 @@
 	flex: 1;
 }
 body {
-	height: 1000px;
+	height: 100%;
 	width: 100%;
 	margin: 0;
 }

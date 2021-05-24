@@ -4,7 +4,7 @@
 			v-for="(title, index) in titles.GOODs"
 			:key="index"
 			:title="title.value"
-			:style="{ color: title.color || '#ffffff' }"
+			:style="{ color: title.color || '#000' }"
 			@click="showEdit(title)"
 		>
 			{{ title.value }}
@@ -33,6 +33,7 @@ export default {
 			oDiv: null,
 			timer: null,
 			titles: { GOODs: [], key: "" },
+			howElliptical: 1,
 			arr: [
 				{
 					UUID: "96325D43EBF2E871E053650C10AC9048",
@@ -260,17 +261,15 @@ export default {
 			let params = {
 				exhType: value,
 				// highNum:10,
-				highNum: 6,
-				lowNum: 10,
+				highNum: 0,
+				lowNum: 18,
 			};
 			var colors = [
 				"#43C5FF",
 				"#8FA1FF",
-				"#FFFFFF",
 				"#FF9A55",
 				"#FF7676",
 				"#FF9A55",
-				"#FFFFFF",
 				"#5FB3FF",
 				"#8493EC",
 			];
@@ -278,7 +277,7 @@ export default {
 			for (let i = 0; i < this.arr.length; i++) {
 				let unit = {};
 				if (this.arr[i].TOTALPRICE == -1) {
-					unit.color = "#FFE91A";
+					unit.color = colors[i % 9];
 					unit.value = this.arr[i].GOODSDESCRIPTIONCN;
 					unit.EXHTYPE = this.arr[i].EXHTYPE;
 					unit.UUID = this.arr[i].UUID;
@@ -293,11 +292,9 @@ export default {
 			// 			var colors = [
 			// 				"#43C5FF",
 			// 				"#8FA1FF",
-			// 				"#FFFFFF",
 			// 				"#FF9A55",
 			// 				"#FF7676",
 			// 				"#FF9A55",
-			// 				"#FFFFFF",
 			// 				"#5FB3FF",
 			// 				"#8493EC",
 			// 			];
@@ -339,7 +336,6 @@ export default {
 				oTag.offsetHeight = this.aSpan[i].offsetHeight;
 				this.mcList.push(oTag);
 			}
-			console.log("mclist", this.mcList);
 			this.positionAll();
 			this.timer = setInterval(() => {
 				this.update();
@@ -347,8 +343,9 @@ export default {
 		},
 		update() {
 			let a, b;
-			a = -this.lasta * 1.2 * this.tspeed;
-			b = -this.lastb * 1.2 * this.tspeed;
+			a = -this.lasta * 1.2 * this.tspeed; //控制x轴的转动角度
+			// b = -this.lastb * 1.2 * this.tspeed;//控制y轴转动的角度
+			b = 0;
 
 			// this.lasta = a;
 			// this.lastb = b;
@@ -390,6 +387,10 @@ export default {
 				this.mcList[j].alpha = per;
 
 				this.mcList[j].alpha = (this.mcList[j].alpha - 0.6) * (10 / 6);
+				// this.mcList[j].alpha = Math.abs(
+				// 	(this.mcList[j].alpha - 0.6) * (10 / 6)
+				// );
+				// this.mcList[j].zIndex = Math.ceil(100 - Math.floor(this.mcList[i].cz))
 			}
 
 			this.doPosition();
@@ -433,12 +434,15 @@ export default {
 			}
 		},
 		positionAll() {
+			//初始位置
 			let phi = 0,
 				theta = 0,
 				max = this.mcList.length,
 				i = 0,
 				aTmp = [],
 				oFragment = document.createDocumentFragment();
+
+			console.log("mclist", this.mcList);
 
 			for (let i = 0; i < this.aSpan.length; i++) {
 				aTmp.push(this.aSpan[i]);
@@ -459,8 +463,9 @@ export default {
 				theta = Math.sqrt(max * Math.PI) * phi;
 
 				this.mcList[i - 1].cx = this.radius * Math.cos(theta) * Math.sin(phi);
-				this.mcList[i - 1].cy = this.radius * Math.sin(theta) * Math.sin(phi);
-				this.mcList[i - 1].cz = this.radius * Math.cos(phi);
+				this.mcList[i - 1].cy =
+					(this.radius * Math.sin(theta) * Math.sin(phi)) / 4; // /4
+				this.mcList[i - 1].cz = (this.radius * Math.cos(phi)) / 4; // /4
 				this.aSpan[i - 1].style.left =
 					this.mcList[i - 1].cx +
 					this.oDiv.offsetWidth / 2 -
@@ -494,7 +499,7 @@ export default {
 #rotate {
 	position: relative;
 	margin: 0 auto;
-	width: 927px;
+	width: 792px;
 	height: 238px;
 }
 #rotate span {
